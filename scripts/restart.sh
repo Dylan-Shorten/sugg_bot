@@ -1,0 +1,2 @@
+./kill.sh
+./start.sh
