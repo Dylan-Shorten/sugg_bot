@@ -17,10 +17,13 @@ def main():
     async def on_message(message):
         if message.author == client.user:
             return
-        words = shlex.split(message.content)
-        if words[0] == 'sb':
-            if words[1] == 'ping':
-                await message.channel.send('pong')
+        if message.content.startswith('sb '):
+            try:
+                words = shlex.split(message.content)
+                if words[1] == 'ping':
+                    await message.channel.send('pong')
+            except ValueError:
+                pass
     token = load_token()
     client.run(token)
 
