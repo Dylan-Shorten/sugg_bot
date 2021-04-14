@@ -5,6 +5,7 @@ import discord
 
 import sb_parser
 import sb_vars
+import sb_react
 
 def load_token():
     '''load discord token'''
@@ -21,6 +22,7 @@ def main():
             return
         await sb_parser.parse_input(message.content, message.channel)
     sb_vars.load_vars()
+    sb_react.load_reacts()
     token = load_token()
     client.run(token)
 

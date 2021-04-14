@@ -3,6 +3,7 @@
 import collections
 
 import sb_vars
+import sb_react
 
 Command = collections.namedtuple('Command', ['opts', 'long_opts', 'func'])
 
@@ -53,9 +54,34 @@ async def command_listvars(opts, args, channel):
     string = string[:-1]
     await channel.send(string)
 
+async def command_react(opts, args, channel):
+    '''command react'''
+    if not len(args) == 2:
+        await channel.send('react takes 2 args')
+        return
+    sb_react.reacts[args[0]] = args[1]
+    sb_react.save_reacts()
+    await channel.send('set react ' + args[0] + ' to ' + args[1])
+
+async def command_listreacts(opts, args, channel):
+    '''command listreacts'''
+    if len(args) > 0:
+        await channel.send('listreacts takes 0 args')
+        return
+    if len(sb_react.reacts) == 0:
+        await channel.send('no reacts')
+        return
+    string = ''
+    for i in sb_react.reacts:
+        string += i + ' = ' + sb_react.reacts[i] + '\n'
+    string = string[:-1]
+    await channel.send(string)
+
 COMMANDS = {
         'ping': Command('', [], command_ping),
         'echo': Command('lu', [], command_echo),
         'set': Command('', [], command_set),
-        'listvars': Command('', [], command_listvars)
+        'listvars': Command('', [], command_listvars),
+        'react': Command('', [], command_react),
+        'listreacts': Command('', [], command_listreacts)
         }
