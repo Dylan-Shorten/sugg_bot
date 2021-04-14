@@ -14,8 +14,12 @@ def replace_var(string, name, value):
         string = replace_range(string, i, len(var_string), value)
     return string
 
-def replace_vars(string, var_list):
+def replace_vars(string):
     '''replace all instances of vars in a string'''
-    for name in var_list:
-        string = replace_var(string, name, var_list[name])
+    for name in variables:
+        string = replace_var(string, name, variables[name])
     return string
+
+variables = {
+        'p': 'ping'
+        }

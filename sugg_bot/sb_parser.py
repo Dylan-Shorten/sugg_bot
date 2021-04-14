@@ -4,11 +4,13 @@ import shlex
 import getopt
 
 import sb_commands
+import sb_vars
 
 async def parse_input(message, channel):
     '''parses an input string'''
     if not message.startswith('sb '):
         return
+    message = sb_vars.replace_vars(message)
     try:
         words = shlex.split(message)
     except ValueError as error:
