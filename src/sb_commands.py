@@ -1,9 +1,9 @@
-'''commands'''
+'''sugg bot commands'''
 
 import collections
 
 import sb_vars
-import sb_react
+import sb_reacts
 
 Command = collections.namedtuple('Command', ['opts', 'long_opts', 'func'])
 
@@ -59,8 +59,8 @@ async def command_react(opts, args, channel):
     if not len(args) == 2:
         await channel.send('react takes 2 args')
         return
-    sb_react.reacts[args[0]] = args[1]
-    sb_react.save_reacts()
+    sb_reacts.reacts[args[0]] = args[1]
+    sb_reacts.save_reacts()
     await channel.send('set react ' + args[0] + ' to ' + args[1])
 
 async def command_listreacts(opts, args, channel):
@@ -68,12 +68,12 @@ async def command_listreacts(opts, args, channel):
     if len(args) > 0:
         await channel.send('listreacts takes 0 args')
         return
-    if len(sb_react.reacts) == 0:
+    if len(sb_reacts.reacts) == 0:
         await channel.send('no reacts')
         return
     string = ''
-    for i in sb_react.reacts:
-        string += i + ' = ' + sb_react.reacts[i] + '\n'
+    for i in sb_reacts.reacts:
+        string += i + ' = ' + sb_reacts.reacts[i] + '\n'
     string = string[:-1]
     await channel.send(string)
 

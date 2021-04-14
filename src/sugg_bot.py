@@ -3,9 +3,9 @@
 import pathlib
 import discord
 
-import sb_parser
+import sb_parse
 import sb_vars
-import sb_react
+import sb_reacts
 
 def load_token():
     '''load discord token'''
@@ -20,9 +20,9 @@ def main():
     async def on_message(message):
         if message.author == client.user:
             return
-        await sb_parser.parse_input(message.content, message.channel)
+        await sb_parse.parse_input(message.content, message.channel)
     sb_vars.load_vars()
-    sb_react.load_reacts()
+    sb_reacts.load_reacts()
     token = load_token()
     client.run(token)
 

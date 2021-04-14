@@ -5,11 +5,11 @@ import getopt
 
 import sb_commands
 import sb_vars
-import sb_react
+import sb_reacts
 
 async def parse_input(message, channel):
     '''parses an input string'''
-    if await sb_react.parse_react(message, channel):
+    if await sb_reacts.parse_react(message, channel):
         return
     if not message.startswith('sb '):
         return

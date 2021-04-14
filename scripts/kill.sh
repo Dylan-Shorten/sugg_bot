@@ -1,1 +1,1 @@
-pkill -f "python3 ../sugg_bot/sb_main.py"
+pkill -f "python3 ../src/sugg_bot.py"

@@ -1,1 +1,1 @@
-python3 ../sugg_bot/sb_main.py &
+python3 ../src/sugg_bot.py &

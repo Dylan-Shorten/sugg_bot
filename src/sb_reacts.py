@@ -24,4 +24,5 @@ async def parse_react(string, channel):
         return True
     return False
 
+# pylint: disable=invalid-name
 reacts = {}
