@@ -1,8 +1,9 @@
 '''sugg discord bot'''
 
 import pathlib
-import shlex
 import discord
+
+import sb_parser
 
 def load_token():
     '''load discord token'''
@@ -17,13 +18,7 @@ def main():
     async def on_message(message):
         if message.author == client.user:
             return
-        if message.content.startswith('sb '):
-            try:
-                words = shlex.split(message.content)
-                if words[1] == 'ping':
-                    await message.channel.send('pong')
-            except ValueError:
-                pass
+        await sb_parser.parse_input(message.content, message.channel)
     token = load_token()
     client.run(token)
 
