@@ -20,6 +20,4 @@ def replace_vars(string):
         string = replace_var(string, name, variables[name])
     return string
 
-variables = {
-        'p': 'ping'
-        }
+variables = {}
