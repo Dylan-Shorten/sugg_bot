@@ -1,2 +1,5 @@
 # discord bot token
 data/token.txt
+
+# pycache
+__pycache__
