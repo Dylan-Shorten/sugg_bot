@@ -1,8 +1,6 @@
 '''commands'''
 
 import collections
-import os
-import pathlib
 
 import sb_vars
 
@@ -38,6 +36,7 @@ async def command_set(opts, args, channel):
         await channel.send('set takes 2 args')
         return
     sb_vars.variables[args[0]] = args[1]
+    sb_vars.save_vars()
     await channel.send('set ' + args[0] + ' to ' + args[1])
 
 async def command_listvars(opts, args, channel):

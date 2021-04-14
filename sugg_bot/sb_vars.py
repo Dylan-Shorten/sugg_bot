@@ -20,4 +20,22 @@ def replace_vars(string):
         string = replace_var(string, name, variables[name])
     return string
 
+def load_vars():
+    '''load vars from file'''
+    variables.clear()
+    with open('../data/vars.txt') as vars_file:
+        for line in vars_file:
+            split = line.replace('\n', '').split('=')
+            variables[split[0]] = split[1]
+
+def save_vars():
+    '''save vars to file'''
+    string = ''
+    for i in variables:
+        string += i + '=' + variables[i] + '\n'
+    string = string[:-1]
+    with open('../data/vars.txt', 'w') as vars_file:
+        vars_file.write(string)
+
+# pylint: disable=invalid-name
 variables = {}

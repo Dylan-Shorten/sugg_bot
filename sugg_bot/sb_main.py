@@ -4,6 +4,7 @@ import pathlib
 import discord
 
 import sb_parser
+import sb_vars
 
 def load_token():
     '''load discord token'''
@@ -19,6 +20,7 @@ def main():
         if message.author == client.user:
             return
         await sb_parser.parse_input(message.content, message.channel)
+    sb_vars.load_vars()
     token = load_token()
     client.run(token)
 
