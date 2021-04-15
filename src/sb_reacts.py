@@ -1,28 +1,31 @@
-'''sugg bot reacts'''
+'''sugg bot reactions'''
 
-def load_reacts():
-    '''load reacts from file'''
-    reacts.clear()
-    with open('../data/reacts.txt') as reacts_file:
-        for line in reacts_file:
-            split = line.replace('\n', '').split('=')
-            reacts[split[0]] = split[1]
+class Reactor:
+    file_path = ''
+    reacts = {}
 
-def save_reacts():
-    '''save reacts to file'''
-    string = ''
-    for i in reacts:
-        string += i + '=' + reacts[i] + '\n'
-    string = string[:-1]
-    with open('../data/reacts.txt', 'w') as reacts_file:
-        reacts_file.write(string)
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.load_reacts()
 
-async def parse_react(string, channel):
-    '''respond if the string is a react'''
-    if string in reacts:
-        await channel.send(reacts[string])
-        return True
-    return False
+    def react(self, string):
+        if string in self.reacts:
+            return self.reacts[string]
+        return ''
 
-# pylint: disable=invalid-name
-reacts = {}
+    def load_reacts(self):
+        self.reacts.clear()
+        with open(self.file_path) as reacts_file:
+            for line in reacts_file:
+                i = line.index('=')
+                name = line[:i]
+                value = line[i + 1:].replace('\n', '')
+                self.reacts[name] = value
+
+    def save_reacts(self):
+        string = ''
+        for i in self.reacts:
+            string += i + '=' + self.reacts[i] + '\n'
+        string = string[:-1]
+        with open(self.file_path, 'w') as reacts_file:
+            reacts_file.write(string)

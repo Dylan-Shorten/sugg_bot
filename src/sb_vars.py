@@ -1,12 +1,10 @@
-'''string var replacer'''
+'''sugg bot variables'''
 
 def replace_range(string, start, length, value):
-    '''remove a range in a string and replace it with a value'''
     return string[:start] + value + string[start + length:]
 
 def replace_var(string, name, value):
-    '''replace all instances of a var in a string'''
-    var_string = '{' + name + '}'
+    var_string = '<' + name + '>'
     while True:
         i = string.find(var_string)
         if i == -1:
@@ -14,28 +12,32 @@ def replace_var(string, name, value):
         string = replace_range(string, i, len(var_string), value)
     return string
 
-def replace_vars(string):
-    '''replace all instances of vars in a string'''
-    for name in variables:
-        string = replace_var(string, name, variables[name])
-    return string
+class VarHandler:
+    file_path = ''
+    variables = {}
 
-def load_vars():
-    '''load vars from file'''
-    variables.clear()
-    with open('../data/vars.txt') as vars_file:
-        for line in vars_file:
-            split = line.replace('\n', '').split('=')
-            variables[split[0]] = split[1]
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.load_vars()
 
-def save_vars():
-    '''save vars to file'''
-    string = ''
-    for i in variables:
-        string += i + '=' + variables[i] + '\n'
-    string = string[:-1]
-    with open('../data/vars.txt', 'w') as vars_file:
-        vars_file.write(string)
+    def replace_vars(self, string):
+        for name in self.variables:
+            string = replace_var(string, name, self.variables[name])
+        return string
 
-# pylint: disable=invalid-name
-variables = {}
+    def load_vars(self):
+        self.variables.clear()
+        with open(self.file_path) as vars_file:
+            for line in vars_file:
+                i = line.index('=')
+                name = line[:i]
+                value = line[i + 1:].replace('\n', '')
+                self.variables[name] = value
+
+    def save_vars(self):
+        string = ''
+        for i in self.variables:
+            string += i + '=' + self.variables[i] + '\n'
+        string = string[:-1]
+        with open(self.file_path, 'w') as vars_file:
+            vars_file.write(string)

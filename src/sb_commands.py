@@ -1,87 +1,94 @@
-'''sugg bot commands'''
+'''sugg bot command parser'''
 
+import shlex
 import collections
-
-import sb_vars
-import sb_reacts
+import getopt
 
 Command = collections.namedtuple('Command', ['opts', 'long_opts', 'func'])
 
-# pylint: disable=unused-argument
-async def command_ping(opts, args, channel):
-    '''command ping'''
-    if len(args) > 0:
-        await channel.send('ping takes 0 args')
-        return
-    await channel.send('pong')
+def invalid_arg_count(name, count):
+    return name + ' does not take ' + str(count) + ' args'
 
-async def command_echo(opts, args, channel):
-    '''command echo'''
-    if len(args) < 1:
-        await channel.send('echo takes 1 or more args')
-        return
-    string = ''
-    for arg in args:
-        string += arg + ' '
-    string = string[:-1]
-    for (opt, arg) in opts:
-        if opt == '-l':
-            string = string.lower()
-        elif opt == '-u':
-            string = string.upper()
-    await channel.send(string)
+class CommandParser:
+    commands = {}
+    reactor = None
+    variables = None
 
-async def command_set(opts, args, channel):
-    '''command set'''
-    if not len(args) == 2:
-        await channel.send('set takes 2 args')
-        return
-    sb_vars.variables[args[0]] = args[1]
-    sb_vars.save_vars()
-    await channel.send('set ' + args[0] + ' to ' + args[1])
+    def __init__(self, reactor, variables):
+        self.reactor = reactor
+        self.variables = variables
+        self.add_command('ping', '', [], self.ping)
+        self.add_command('echo', 'lu', ['lower', 'upper'], self.echo)
+        self.add_command('react', '', [], self.react)
+        self.add_command('listreacts', '', [], self.listreacts)
+        self.add_command('set', '', [], self.set)
+        self.add_command('listvars', '', [], self.listvars)
 
-async def command_listvars(opts, args, channel):
-    '''command listvars'''
-    if len(args) > 0:
-        await channel.send('listvars takes 0 args')
-        return
-    if len(sb_vars.variables) == 0:
-        await channel.send('no vars')
-        return
-    string = ''
-    for i in sb_vars.variables:
-        string += i + ' = ' + sb_vars.variables[i] + '\n'
-    string = string[:-1]
-    await channel.send(string)
+    def add_command(self, name, opts, long_opts, func):
+        self.commands[name] = Command(opts, long_opts, func)
 
-async def command_react(opts, args, channel):
-    '''command react'''
-    if not len(args) == 2:
-        await channel.send('react takes 2 args')
-        return
-    sb_reacts.reacts[args[0]] = args[1]
-    sb_reacts.save_reacts()
-    await channel.send('set react ' + args[0] + ' to ' + args[1])
+    # parses command input
+    # returns a string containing command output
+    # command prefix should be trimmed off before calling parse
+    def parse(self, string):
+        words = shlex.split(string)
+        if len(words) < 1:
+            return 'no command'
+        name = words[0]
+        if not name in self.commands:
+            return name + ' is not a command'
+        com = self.commands[name]
+        try:
+            (opts, args) = getopt.getopt(words[1:], com.opts, com.long_opts)
+        except getopt.GetoptError as error:
+            return error
+        return com.func(opts, args)
 
-async def command_listreacts(opts, args, channel):
-    '''command listreacts'''
-    if len(args) > 0:
-        await channel.send('listreacts takes 0 args')
-        return
-    if len(sb_reacts.reacts) == 0:
-        await channel.send('no reacts')
-        return
-    string = ''
-    for i in sb_reacts.reacts:
-        string += i + ' = ' + sb_reacts.reacts[i] + '\n'
-    string = string[:-1]
-    await channel.send(string)
+    def ping(self, opts, args):
+        if len(args) > 0:
+            return invalid_arg_count('ping', len(args))
+        return 'pong'
 
-COMMANDS = {
-        'ping': Command('', [], command_ping),
-        'echo': Command('lu', [], command_echo),
-        'set': Command('', [], command_set),
-        'listvars': Command('', [], command_listvars),
-        'react': Command('', [], command_react),
-        'listreacts': Command('', [], command_listreacts)
-        }
+    def echo(self, opts, args):
+        if len(args) == 0:
+            return invalid_arg_count('echo', 0)
+        string = ''
+        for arg in args:
+            string += arg + ' '
+        string = string[:-1]
+        for (opt, arg) in opts:
+            if opt in ['-l', '--lower']:
+                string = string.lower()
+            elif opt in ['-u', '--upper']:
+                string = string.upper()
+        return string
+
+    def react(self, opts, args):
+        if not len(args) == 2:
+            return invalid_arg_count('react', len(args))
+        self.reactor.reacts[args[0]] = args[1]
+        self.reactor.save_reacts()
+        return 'set react ' + args[0] + ' to ' + args[1]
+
+    def listreacts(self, opts, args):
+        if len(self.reactor.reacts) == 0:
+            return 'no reacts'
+        string = ''
+        for i in self.reactor.reacts:
+            string += i + ' = ' + self.reactor.reacts[i] + '\n'
+        return string[:-1]
+
+    def set(self, opts, args):
+        if not len(args) == 2:
+            return invalid_arg_count('set', len(args))
+        self.variables.variables[args[0]] = args[1]
+        self.variables.save_vars()
+        return 'set var ' + args[0] + ' to ' + args[1]
+
+    def listvars(self, opts, args):
+        if len(self.variables.variables) == 0:
+            return 'no vars'
+        string = ''
+        for i in self.variables.variables:
+            string += i + ' = ' + self.variables.variables[i] + '\n'
+        return string[:-1]
