@@ -5,12 +5,14 @@ def replace_range(string, start, length, value):
 
 def replace_var(string, name, value):
     var_string = '<' + name + '>'
+    count = 0
     while True:
         i = string.find(var_string)
         if i == -1:
             break
         string = replace_range(string, i, len(var_string), value)
-    return string
+        count += 1
+    return (string, count)
 
 class VarHandler:
     file_path = ''
@@ -21,8 +23,13 @@ class VarHandler:
         self.load_vars()
 
     def replace_vars(self, string):
-        for name in self.variables:
-            string = replace_var(string, name, self.variables[name])
+        while True:
+            total = 0
+            for name in self.variables:
+                (string, count) = replace_var(string, name, self.variables[name])
+                total += count
+            if total == 0:
+                break
         return string
 
     def load_vars(self):
