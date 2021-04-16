@@ -11,6 +11,12 @@ def invalid_arg_count(name, count):
     '''creates a string to print about invalid arg count'''
     return name + ' does not take ' + str(count) + ' args'
 
+def run_sys_command(command):
+    '''run a terminal command and return the output string'''
+    split = command.split(' ')
+    result = subprocess.run(split, stdout = subprocess.PIPE)
+    return result.stdout.decode('utf-8')
+
 class CommandParser:
     '''command input parser'''
     commands = {}
@@ -109,15 +115,7 @@ class CommandParser:
         '''neofetch command'''
         if len(args) != 0:
             return invalid_arg_count('neofetch', len(args))
-        command = [
-                'neofetch',
-                '--stdout',
-                '--disable',
-                'title',
-                'underline'
-                ]
-        result = subprocess.run(command, stdout = subprocess.PIPE)
-        string =  result.stdout.decode('utf-8')
+        string = run_sys_command('neofetch --stdout --disable title underline')
         return string[:-2]
     # pylint: enable=no-self-use
     # pylint: enable=unused-argument
