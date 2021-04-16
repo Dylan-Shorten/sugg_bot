@@ -3,6 +3,7 @@
 import shlex
 import collections
 import getopt
+import subprocess
 
 Command = collections.namedtuple('Command', ['opts', 'long_opts', 'func'])
 
@@ -26,6 +27,7 @@ class CommandParser:
         self.add_command('listreacts', '', [], self.listreacts)
         self.add_command('set', '', [], self.set)
         self.add_command('listvars', '', [], self.listvars)
+        self.add_command('neofetch', '', [], self.neofetch)
 
     def add_command(self, name, opts, long_opts, func):
         '''add a command'''
@@ -102,5 +104,20 @@ class CommandParser:
         for i in self.variables.variables:
             string += i + ' = ' + self.variables.variables[i] + '\n'
         return string[:-1]
+
+    def neofetch(self, opts, args):
+        '''neofetch command'''
+        if len(args) != 0:
+            return invalid_arg_count('neofetch', len(args))
+        command = [
+                'neofetch',
+                '--stdout',
+                '--disable',
+                'title',
+                'underline'
+                ]
+        result = subprocess.run(command, stdout = subprocess.PIPE)
+        string =  result.stdout.decode('utf-8')
+        return string[:-2]
     # pylint: enable=no-self-use
     # pylint: enable=unused-argument
