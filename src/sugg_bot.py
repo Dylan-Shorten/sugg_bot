@@ -7,44 +7,37 @@ import sb_commands
 import sb_reacts
 import sb_vars
 
-class SuggBot:
-    client = None
-    token = ''
-    prefix = ''
-    variables = None
-    reactor = None
-    parser = None
+def run(data_path, prefix):
+    '''run the bot'''
+    client = discord.Client()
+    token = pathlib.Path(data_path + 'token.txt').read_text()
+    token = token.replace('\n', '')
+    variables = sb_vars.VarHandler(data_path + 'vars.txt')
+    reactor = sb_reacts.Reactor(data_path + 'reacts.txt')
+    parser = sb_commands.CommandParser(reactor, variables)
 
-    def __init__(self, data_path, prefix):
-        self.client = discord.Client()
-        self.token = pathlib.Path(data_path + 'token.txt').read_text()
-        self.token = self.token.replace('\n', '')
-        self.prefix = prefix
-        self.variables = sb_vars.VarHandler(data_path + 'vars.txt')
-        self.reactor = sb_reacts.Reactor(data_path + 'reacts.txt')
-        self.parser = sb_commands.CommandParser(self.reactor, self.variables)
+    # pylint: disable=unused-variable
+    @client.event
+    async def on_message(message):
+        '''on message event'''
+        if message.author == client.user:
+            return
+        string = variables.replace_vars(message.content)
+        react = reactor.react(string)
+        if react != '':
+            await message.channel.send(react)
+            return
+        if string.startswith(prefix):
+            trimmed = string[len(prefix):]
+            result = parser.parse(trimmed)
+            await message.channel.send(result)
+    # pylint: enable=unused-variable
 
-        @self.client.event
-        async def on_message(message):
-            if message.author == self.client.user:
-                return
-            string = self.variables.replace_vars(message.content)
-            react = self.reactor.react(string)
-            if not react == '':
-                await message.channel.send(react)
-                return
-            if string.startswith(self.prefix):
-                trimmed = string[len(self.prefix):]
-                result = self.parser.parse(trimmed)
-                await message.channel.send(result)
-
-    def run(self):
-        self.client.run(self.token)
+    client.run(token)
 
 def main():
     '''main'''
-    bot = SuggBot('../data/', 'sb ')
-    bot.run()
+    run('../data/', 'sb ')
 
 if __name__ == '__main__':
     main()

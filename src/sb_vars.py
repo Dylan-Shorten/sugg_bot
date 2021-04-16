@@ -1,9 +1,11 @@
 '''sugg bot variables'''
 
 def replace_range(string, start, length, value):
+    '''remove a range in a string and replace it with a value'''
     return string[:start] + value + string[start + length:]
 
 def replace_var(string, name, value):
+    '''replace all instances of a var in a string'''
     var_string = '<' + name + '>'
     count = 0
     while True:
@@ -15,14 +17,17 @@ def replace_var(string, name, value):
     return (string, count)
 
 class VarHandler:
+    '''variable handler'''
     file_path = ''
     variables = {}
 
     def __init__(self, file_path):
+        '''constructor'''
         self.file_path = file_path
         self.load_vars()
 
     def replace_vars(self, string):
+        '''replace all instances of all vars in a string'''
         while True:
             total = 0
             for name in self.variables:
@@ -33,6 +38,7 @@ class VarHandler:
         return string
 
     def load_vars(self):
+        '''load vars from file'''
         self.variables.clear()
         with open(self.file_path) as vars_file:
             for line in vars_file:
@@ -42,6 +48,7 @@ class VarHandler:
                 self.variables[name] = value
 
     def save_vars(self):
+        '''save vars to file'''
         string = ''
         for i in self.variables:
             string += i + '=' + self.variables[i] + '\n'
