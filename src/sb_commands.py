@@ -14,7 +14,7 @@ def invalid_arg_count(name, count):
 def run_sys_command(command):
     '''run a terminal command and return the output string'''
     split = command.split(' ')
-    result = subprocess.run(split, stdout = subprocess.PIPE)
+    result = subprocess.run(split, stdout=subprocess.PIPE, check=True)
     return result.stdout.decode('utf-8')
 
 class CommandParser:
