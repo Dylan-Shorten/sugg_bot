@@ -2,7 +2,7 @@ import getopt
 import collections
 import shlex
 
-Command = collections.namedtuple('Command', ['opts', 'lopts', 'argc', 'func'])
+Command = collections.namedtuple('Command', ['opts', 'lopts', 'func'])
 
 def concat_strs(strings):
     full = ''
@@ -44,10 +44,9 @@ class SuggBot:
         self.reacts_path = data_path + 'reacts.txt'
         self.reacts = load_dict(self.reacts_path)
         self.commands = {
-            'ping': Command('', [], 0, self.__ping),
-            'echo': Command('lu', [], 1, self.__echo),
-            'react': Command('', [], 2, self.__react),
-            'listreacts': Command('', [], 0, self.__listreacts)
+            'ping': Command('', [], self.__ping),
+            'echo': Command('lu', [], self.__echo),
+            'react': Command('l', [], self.__react)
             }
 
     def parse(self, string):
@@ -74,14 +73,16 @@ class SuggBot:
             opts, args = getopt.getopt(words[1:], com.opts, com.lopts)
         except getopt.GetoptError as error:
             return error
-        if len(args) != com.argc:
-            return name + ' takes ' + str(com.argc) + ' args'
         return com.func(opts, args)
 
     def __ping(self, opts, args):
+        if len(args) != 0:
+            return 'ping cannot take ' + str(len(args)) + ' args'
         return 'pong'
 
     def __echo(self, opts, args):
+        if len(args) != 1:
+            return 'echo cannot take ' + str(len(args)) + ' args'
         string = args[0]
         for opt, arg in opts:
             if opt == '-l':
@@ -91,13 +92,29 @@ class SuggBot:
         return string
 
     def __react(self, opts, args):
+        mode_react = 0
+        mode_list = 1
+        mode = mode_react
+        for opt, arg in opts:
+            if opt == '-l':
+                mode = mode_list
+        if mode == mode_react:
+            return self.__react_react(opts, args)
+        else:
+            return self.__react_list(opts, args)
+
+    def __react_react(self, opts, args):
+        if len(args) != 2:
+            return 'react cannot take ' + str(len(args)) + ' args'
         name = args[0]
         val = args[1]
         self.reacts[name] = val
         save_dict(self.reacts, self.reacts_path)
         return 'set react \"' + name + '\" = ' + '\"' + val + '\"'
 
-    def __listreacts(self, opts, args):
+    def __react_list(self, opts, args):
+        if len(args) != 0:
+            return 'react cannot take ' + str(len(args)) + ' args'
         string = ''
         for key in self.reacts:
             val = self.reacts[key]
