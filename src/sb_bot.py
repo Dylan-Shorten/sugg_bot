@@ -46,7 +46,7 @@ class SuggBot:
         self.commands = {
             'ping': Command('', [], self.__ping),
             'echo': Command('lu', [], self.__echo),
-            'react': Command('l', [], self.__react)
+            'react': Command('ld', [], self.__react)
             }
 
     def parse(self, string):
@@ -94,14 +94,19 @@ class SuggBot:
     def __react(self, opts, args):
         mode_react = 0
         mode_list = 1
+        mode_del = 2
         mode = mode_react
         for opt, arg in opts:
             if opt == '-l':
                 mode = mode_list
+            elif opt == '-d':
+                mode = mode_del
         if mode == mode_react:
             return self.__react_react(opts, args)
-        else:
+        elif mode == mode_list:
             return self.__react_list(opts, args)
+        else:
+            return self.__react_del(opts, args)
 
     def __react_react(self, opts, args):
         if len(args) != 2:
@@ -121,3 +126,13 @@ class SuggBot:
             string += key + ' = ' + val + '\n'
         string = string[:-1]
         return string
+
+    def __react_del(self, opts, args):
+        if len(args) != 1:
+            return 'react cannot take ' + str(len(args)) + ' args'
+        name = args[0]
+        if not name in self.reacts:
+            return 'react \"' + name + '\" does not exist'
+        del self.reacts[name]
+        save_dict(self.reacts, self.reacts_path)
+        return 'deleted react \"' + name + '\"'
