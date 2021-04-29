@@ -39,6 +39,8 @@ def write_dict(dictionary, path):
 class SuggBot:
     '''sugg bot class'''
     prefix = ''
+    variables_path = ''
+    variables = {}
     reacts_path = ''
     reacts = {}
     commands = {}
@@ -46,16 +48,20 @@ class SuggBot:
     def __init__(self, prefix, data_path):
         '''constructor'''
         self.prefix = prefix
+        self.variables_path = data_path + 'variables.txt'
+        self.variables = read_dict(self.variables_path)
         self.reacts_path = data_path + 'reacts.txt'
         self.reacts = read_dict(self.reacts_path)
         self.commands = {
             'ping': Command('', [], self.__ping),
             'echo': Command('lu', [], self.__echo),
-            'react': Command('ld', [], self.__react)
+            'react': Command('ld', [], self.__react),
+            'var': Command('ld', [], self.__var)
             }
 
     def parse(self, string):
         '''parse an input string'''
+        string = self.__replace_vars(string)
         react = self.__get_react(string)
         if react != '':
             return react
@@ -82,6 +88,19 @@ class SuggBot:
         except getopt.GetoptError as error:
             return error
         return com.func(opts, args)
+
+    def __replace_vars(self, string):
+        for i in range(0, 100):
+            replaced = False
+            for name in self.variables:
+                var_str = '<' + name + '>'
+                result = string.replace(var_str, self.variables[name])
+                if result != string:
+                    string = result
+                    replaced = True
+            if not replaced:
+                break
+        return string
 
     # pylint: disable=unused-argument
     # pylint: disable=no-self-use
@@ -154,6 +173,58 @@ class SuggBot:
         del self.reacts[name]
         write_dict(self.reacts, self.reacts_path)
         return 'deleted react \"' + name + '\"'
+
+    def __var(self, opts, args):
+        '''var command'''
+        mode_var = 0
+        mode_list = 1
+        mode_del = 2
+        mode = mode_var
+        for opt in opts:
+            if opt[0] == '-l':
+                mode = mode_list
+            elif opt[0] == '-d':
+                mode = mode_del
+        if mode == mode_var:
+            return self.__var_var(opts, args)
+        if mode == mode_list:
+            return self.__var_list(opts, args)
+        return self.__var_del(opts, args)
+
+    def __var_var(self, opts, args):
+        '''var add command'''
+        if len(args) != 2:
+            return 'var cannot take ' + str(len(args)) + ' args'
+        name = args[0]
+        val = args[1]
+        self.variables[name] = val
+        write_dict(self.variables, self.variables_path)
+        return 'set var \"' + name + '\" = ' + '\"' + val + '\"'
+
+    def __var_list(self, opts, args):
+        '''var list command'''
+        if len(args) != 0:
+            return 'var cannot take ' + str(len(args)) + ' args'
+        if len(self.variables) == 0:
+            return 'no vars'
+        string = ''
+        for key in self.variables:
+            val = self.variables[key]
+            string += key + ' = ' + val + '\n'
+        string = string[:-1]
+        return string
+
+    def __var_del(self, opts, args):
+        '''var del command'''
+        if len(args) != 1:
+            return 'var cannot take ' + str(len(args)) + ' args'
+        name = args[0]
+        if not name in self.variables:
+            return 'var \"' + name + '\" does not exist'
+        del self.variables[name]
+        write_dict(self.variables, self.variables_path)
+        return 'deleted var \"' + name + '\"'
+
 
     # pylint: disable=no-self-use
     # pylint: enable=unused-argument
