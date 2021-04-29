@@ -90,7 +90,7 @@ class SuggBot:
         return com.func(opts, args)
 
     def __replace_vars(self, string):
-        for i in range(0, 100):
+        for _ in range(0, 100):
             replaced = False
             for name in self.variables:
                 var_str = '<' + name + '>'
@@ -224,7 +224,6 @@ class SuggBot:
         del self.variables[name]
         write_dict(self.variables, self.variables_path)
         return 'deleted var \"' + name + '\"'
-
 
     # pylint: disable=no-self-use
     # pylint: enable=unused-argument
