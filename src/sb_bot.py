@@ -135,6 +135,8 @@ class SuggBot:
         '''react list command'''
         if len(args) != 0:
             return 'react cannot take ' + str(len(args)) + ' args'
+        if len(self.reacts) == 0:
+            return 'no reacts'
         string = ''
         for key in self.reacts:
             val = self.reacts[key]
