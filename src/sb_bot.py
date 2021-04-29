@@ -3,13 +3,16 @@
 import getopt
 import collections
 import shlex
+import os
 
 Command = collections.namedtuple('Command', ['opts', 'lopts', 'func'])
 
 def read_dict(path):
     '''read a dict from file'''
     result = {}
-    with open(path) as file:
+    if not os.path.isfile(path):
+        return result
+    with open(path, 'r') as file:
         for line in file:
             i = line.find('=')
             if i == -1:
@@ -28,6 +31,7 @@ def write_dict(dictionary, path):
         val = dictionary[key]
         string += key + '=' + val + '\n'
     string = string[:-1]
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as file:
         file.write(string)
 
