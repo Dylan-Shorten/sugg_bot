@@ -1,9 +1,10 @@
+'''offline bot tester'''
+
 import sb_bot
-import shlex
 
 def main():
+    '''main function'''
     sbot = sb_bot.SuggBot('sb ', '../data/')
-    prefix = 'sb '
     while True:
         inp = input(':')
         if inp == 'exit':
