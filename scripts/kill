@@ -1,1 +1,2 @@
-pkill -f "python3 ../src/sb_main.py"
+echo killing sugg_bot tmux session 
+tmux kill-session -t sugg_bot

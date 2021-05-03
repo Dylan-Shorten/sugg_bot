@@ -1,1 +1,2 @@
-python3 ../src/sb_main.py &
+echo starting sugg_bot tmux session
+tmux new -d -s sugg_bot "python3 ../src/sb_main.py"
