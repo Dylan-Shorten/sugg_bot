@@ -2,8 +2,8 @@
 
 import os
 
-data_path = '../data/'
-logs_path = data_path + 'logs/'
+DATA_PATH = '../data/'
+LOGS_PATH = DATA_PATH + 'logs/'
 
 def read_dict(path):
     '''read a dict from file'''

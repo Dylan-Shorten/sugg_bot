@@ -1,15 +1,20 @@
+'''sugg bot react command'''
+
 import sys
 import getopt
 
 import sb_utils
 
 def read_reacts():
-    return sb_utils.read_dict(sb_utils.data_path + 'reacts.txt')
+    '''read reacts from file'''
+    return sb_utils.read_dict(sb_utils.DATA_PATH + 'reacts.txt')
 
 def write_reacts(reacts):
-    sb_utils.write_dict(reacts, sb_utils.data_path + 'reacts.txt')
+    '''write reacts to file'''
+    sb_utils.write_dict(reacts, sb_utils.DATA_PATH + 'reacts.txt')
 
 def mode_react(args):
+    '''react set mode'''
     if len(args) != 2:
         print('invalid argc')
         return
@@ -21,6 +26,7 @@ def mode_react(args):
     print('set react', name, 'to', value)
 
 def mode_list(args):
+    '''react list mode'''
     if len(args) != 0:
         print('invalid argc')
         return
@@ -32,6 +38,7 @@ def mode_list(args):
         print(i, '=', reacts[i])
 
 def mode_delete(args):
+    '''react delete mode'''
     if len(args) != 1:
         print('invalid argc')
         return
@@ -45,12 +52,13 @@ def mode_delete(args):
     print('react', name, 'does not exist')
 
 def main():
+    '''main func'''
     func = mode_react
     opts, args = getopt.getopt(sys.argv[1:], 'ld', ['list', 'delete'])
-    for opt, arg in opts:
-        if opt in ['-l', '--list']:
+    for opt in opts:
+        if opt[0] in ['-l', '--list']:
             func = mode_list
-        elif opt in ['-d', '--delete']:
+        elif opt[0] in ['-d', '--delete']:
             func = mode_delete
     func(args)
 

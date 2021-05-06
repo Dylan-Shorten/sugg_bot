@@ -12,10 +12,12 @@ import discord
 import sb_utils
 
 def timestamp():
+    '''get a timestamp'''
     zone = datetime.timezone(datetime.timedelta(hours=10))
     return datetime.datetime.now(tz=zone)
 
 async def send_reply(message, response, client, log_file):
+    '''send a message to discord and the log'''
     await message.reply(response)
     log_str = ''
     log_str += str(timestamp()) + '\n'
@@ -28,12 +30,13 @@ async def send_reply(message, response, client, log_file):
         file.write(log_str + '\n')
 
 def replace_vars(string):
-    vars = sb_utils.read_dict(sb_utils.data_path + 'vars.txt')
+    '''replace vars in a string'''
+    variables = sb_utils.read_dict(sb_utils.DATA_PATH + 'variables.txt')
     for _ in range(0, 100):
         replaced = False
-        for name in vars:
+        for name in variables:
             var_str = '<' + name + '>'
-            result = string.replace(var_str, vars[name])
+            result = string.replace(var_str, variables[name])
             if result != string:
                 string = result
                 replaced = True
@@ -43,7 +46,7 @@ def replace_vars(string):
 
 def get_react(string):
     '''get a react if it exists'''
-    reacts = sb_utils.read_dict(sb_utils.data_path + 'reacts.txt')
+    reacts = sb_utils.read_dict(sb_utils.DATA_PATH + 'reacts.txt')
     if string in reacts:
         return reacts[string]
     return ''
@@ -57,14 +60,15 @@ def run_command(string):
     if not os.path.isfile(script):
         return name + ' is not a command'
     command = [
-            sys.executable,
-            script
-            ]
+        sys.executable,
+        script
+        ]
     command.extend(args)
-    result = subprocess.run(command, stdout=subprocess.PIPE)
+    result = subprocess.run(command, stdout=subprocess.PIPE, check=False)
     return result.stdout.decode('utf-8')[:-1]
 
 def parse_message(string, prefix):
+    '''parse an input message'''
     string = replace_vars(string)
     react = get_react(string)
     if react != '':
@@ -75,8 +79,9 @@ def parse_message(string, prefix):
 
 def main():
     '''main func'''
-    log_file = sb_utils.logs_path + str(timestamp()) + '.txt'
+    log_file = sb_utils.LOGS_PATH + str(timestamp()) + '.txt'
     client = discord.Client()
+    # pylint: disable=unused-variable
     @client.event
     async def on_message(message):
         '''on message event'''
@@ -85,7 +90,8 @@ def main():
         result = parse_message(message.content, 'sb ')
         if result != '':
             await send_reply(message, result, client, log_file)
-    token = pathlib.Path(sb_utils.data_path + 'token.txt').read_text()
+    # pylint: enable=unused-variable
+    token = pathlib.Path(sb_utils.DATA_PATH + 'token.txt').read_text()
     token = token.replace('\n', '')
     client.run(token)
 

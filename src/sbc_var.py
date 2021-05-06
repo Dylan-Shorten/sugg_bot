@@ -1,15 +1,20 @@
+'''sugg bot var command'''
+
 import sys
 import getopt
 
 import sb_utils
 
 def read_vars():
-    return sb_utils.read_dict(sb_utils.data_path + 'vars.txt')
+    '''read vars from file'''
+    return sb_utils.read_dict(sb_utils.DATA_PATH + 'vars.txt')
 
 def write_vars(variables):
-    sb_utils.write_dict(variables, sb_utils.data_path + 'vars.txt')
+    '''write vars to file'''
+    sb_utils.write_dict(variables, sb_utils.DATA_PATH + 'vars.txt')
 
 def mode_var(args):
+    '''var set mode'''
     if len(args) != 2:
         print('invalid argc')
         return
@@ -21,6 +26,7 @@ def mode_var(args):
     print('set react', name, 'to', value)
 
 def mode_list(args):
+    '''var list mode'''
     if len(args) != 0:
         print('invalid argc')
         return
@@ -32,6 +38,7 @@ def mode_list(args):
         print(i, '=', variables[i])
 
 def mode_delete(args):
+    '''var delete mode'''
     if len(args) != 1:
         print('invalid argc')
         return
@@ -45,12 +52,13 @@ def mode_delete(args):
     print('var', name, 'does not exist')
 
 def main():
+    '''main func'''
     func = mode_var
     opts, args = getopt.getopt(sys.argv[1:], 'ld', ['list', 'delete'])
-    for opt, arg in opts:
-        if opt in ['-l', '--list']:
+    for opt in opts:
+        if opt[0] in ['-l', '--list']:
             func = mode_list
-        elif opt in ['-d', '--delete']:
+        elif opt[0] in ['-d', '--delete']:
             func = mode_delete
     func(args)
 

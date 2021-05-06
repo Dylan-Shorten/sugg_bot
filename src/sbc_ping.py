@@ -1,6 +1,9 @@
+'''sugg bot ping command'''
+
 import sys
 
 def main():
+    '''main func'''
     if len(sys.argv) != 1:
         print('invalid argc')
         return
