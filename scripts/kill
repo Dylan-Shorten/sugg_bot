@@ -1,2 +1,1 @@
-echo killing sugg_bot tmux session 
 tmux kill-session -t sugg_bot
