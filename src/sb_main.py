@@ -31,7 +31,7 @@ async def send_reply(message, response, client, log_file):
 
 def replace_vars(string):
     '''replace vars in a string'''
-    variables = sb_utils.read_dict(sb_utils.DATA_PATH + 'variables.txt')
+    variables = sb_utils.read_dict(sb_utils.DATA_PATH + 'vars.txt')
     for _ in range(0, 100):
         replaced = False
         for name in variables:

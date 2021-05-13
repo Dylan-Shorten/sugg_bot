@@ -54,7 +54,11 @@ def mode_delete(args):
 def main():
     '''main func'''
     func = mode_react
-    opts, args = getopt.getopt(sys.argv[1:], 'ld', ['list', 'delete'])
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'ld', ['list', 'delete'])
+    except getopt.GetoptError as e:
+        print(e)
+        return
     for opt in opts:
         if opt[0] in ['-l', '--list']:
             func = mode_list

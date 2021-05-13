@@ -51,15 +51,23 @@ def mode_delete(args):
         return
     print('var', name, 'does not exist')
 
+def mode_help():
+    '''var help message'''
+    print('for controlling variables')
+    print('options:\n-l: list variables\n-d: delete a variable')
+
 def main():
     '''main func'''
     func = mode_var
-    opts, args = getopt.getopt(sys.argv[1:], 'ld', ['list', 'delete'])
+    opts, args = getopt.getopt(sys.argv[1:], 'ld', ['list', 'delete', 'help'])
     for opt in opts:
         if opt[0] in ['-l', '--list']:
             func = mode_list
         elif opt[0] in ['-d', '--delete']:
             func = mode_delete
+        elif opt[0] == '--help':
+            mode_help()
+            return
     func(args)
 
 if __name__ == '__main__':
