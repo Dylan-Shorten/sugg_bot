@@ -1,6 +1,10 @@
 '''help command'''
 
+import sys
 import os
+import getopt
+
+import commands
 
 def get_commands():
     '''get a list of bot command python scripts'''
@@ -12,13 +16,29 @@ def get_commands():
     for i in os.listdir(path):
         if i.startswith(prefix) and i.endswith(ext):
             name = i[len(prefix):-len(ext)]
-            scripts.append(name)
+            script = os.path.join(path, i)
+            scripts.append((name, script))
     return scripts
 
-def main():
+def main(argv):
     '''main function'''
-    for i in get_commands():
-        print(i)
+    # get opts and args
+    opts, args = getopt.getopt(argv, '', ['info'])
+    for opt, _ in opts:
+        if opt == '--info':
+            print('displays the help message')
+    # print the help message
+    print('command usage:')
+    print('`sb <command> [opts] [args]`')
+    print('')
+    # print list of commands
+    print('commands:')
+    for name, path in get_commands():
+        info_str = commands.run_subprocess([sys.executable, path, '--info'])
+        print(name + ': ' + info_str)
+    print('')
+    # print some extra info
+    print('for more info about a command, run `sb help <command>` or `sb <command> --help`')
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
