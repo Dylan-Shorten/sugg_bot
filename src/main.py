@@ -7,23 +7,7 @@ import pathlib
 import discord
 
 import sb.commands
-
-def src_path():
-    '''get the folder that contains this script'''
-    filepath = os.path.realpath(__file__)
-    return os.path.dirname(filepath)
-
-def script_path():
-    '''get the folder that contains command scripts'''
-    return os.path.join(src_path(), 'sb')
-
-def load_token():
-    '''read the token file'''
-    path = os.path.join(src_path(), '..', 'data', 'token.txt')
-    token = pathlib.Path(path).read_text()
-    if token.endswith('\n'):
-        return token[:-1]
-    return token
+import sb.utils
 
 def main(argv):
     '''main function'''
@@ -35,26 +19,33 @@ def main(argv):
 
 def run_online():
     '''run the bot online'''
-    sp = script_path()
+    # setup bot
     client = discord.Client()
+    # pylint: disable=unused-variable
     @client.event
     async def on_message(message):
         if message.author == client.user:
             return
-        result = sb.commands.parse_input(message.content, sp)
-        if result != None:
+        result = sb.commands.parse_input(message.content)
+        if result is not None:
             await message.reply(result)
-    client.run(load_token())
+    # pylint: enable=unused-variable
+    # load discord token
+    token_path = os.path.join(sb.utils.data_path(), 'token.txt')
+    token = pathlib.Path(token_path).read_text()
+    if token.endswith('\n'):
+        token = token[:-1]
+    # run bot
+    client.run(token)
 
 def run_offline():
     '''run the bot offline'''
-    sp = script_path()
     while True:
         string = input(':')
         if string == 'q':
             break
-        result = sb.commands.parse_input(string, sp)
-        if result != None:
+        result = sb.commands.parse_input(string)
+        if result is not None:
             print(result)
 
 if __name__ == '__main__':

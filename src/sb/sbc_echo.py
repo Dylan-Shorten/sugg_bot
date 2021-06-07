@@ -1,6 +1,9 @@
+'''echo command'''
+
 import sys
 
 def main(argv):
+    '''main function'''
     print(*argv)
 
 if __name__ == '__main__':
