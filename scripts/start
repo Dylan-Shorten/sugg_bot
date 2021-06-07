@@ -1,3 +1,3 @@
 cd ../src
-tmux new -d -s sugg_bot "python3 sb_main.py"
+tmux new -d -s sugg_bot "python3 main.py"
 cd -
