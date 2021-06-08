@@ -6,6 +6,8 @@ import getopt
 
 import commands
 
+INFO_STR = 'displays help messages'
+
 def get_commands():
     '''get a list of bot command python scripts'''
     file_path = os.path.realpath(__file__)
@@ -20,13 +22,7 @@ def get_commands():
             scripts.append((name, script))
     return scripts
 
-def main(argv):
-    '''main function'''
-    # get opts and args
-    opts, args = getopt.getopt(argv, '', ['info'])
-    for opt, _ in opts:
-        if opt == '--info':
-            print('displays the help message')
+def print_generic_help():
     # print the help message
     print('command usage:')
     print('`sb <command> [opts] [args]`')
@@ -34,11 +30,38 @@ def main(argv):
     # print list of commands
     print('commands:')
     for name, path in get_commands():
+        if name == 'help':
+            print(name + ': ' + INFO_STR)
+            continue
         info_str = commands.run_subprocess([sys.executable, path, '--info'])
         print(name + ': ' + info_str)
     print('')
     # print some extra info
     print('for more info about a command, run `sb help <command>` or `sb <command> --help`')
+
+def main(argv):
+    '''main function'''
+    # get opts and args
+    opts, args = getopt.getopt(argv, '', ['help', 'info'])
+    info_opt = False
+    for opt, _ in opts:
+        if opt == '--info':
+            info_opt = True
+
+    # print info
+    if info_opt:
+        print(INFO_STR)
+
+    # print command info
+    for i in args:
+        script = commands.find_command_script(i)
+        command = [sys.executable, script, '--info', '--help']
+        result = commands.run_subprocess(command)
+        print(result)
+
+    # print generic help
+    if not info_opt and len(args) == 0:
+        print_generic_help()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
