@@ -22,6 +22,17 @@ def get_commands():
             scripts.append((name, script))
     return scripts
 
+def print_info():
+    '''print the info message'''
+    print('prints help messages and info')
+
+def print_help():
+    '''print the help message'''
+    print('usage: `sb help [opts] [args]`')
+    print('options:')
+    print('`--help`: print command usage information')
+    print('`--info`: print a short description of the command')
+
 def print_generic_help():
     # print the help message
     print('command usage:')
@@ -42,25 +53,31 @@ def print_generic_help():
 def main(argv):
     '''main function'''
     # get opts and args
-    opts, args = getopt.getopt(argv, '', ['help', 'info'])
+    opts, args = getopt.getopt(argv, '', ['info', 'help'])
     info_opt = False
+    help_opt = False
     for opt, _ in opts:
         if opt == '--info':
             info_opt = True
-
-    # print info
+        elif opt == '--help':
+            help_opt = True
+    # print help message
+    if help_opt:
+        print_help()
+    # print info message
     if info_opt:
-        print(INFO_STR)
-
-    # print command info
+        print_info()
+    # print args command info
     for i in args:
         script = commands.find_command_script(i)
+        if script is None:
+            print('"' + i + '" is not a command')
+            continue
         command = [sys.executable, script, '--info', '--help']
         result = commands.run_subprocess(command)
         print(result)
-
     # print generic help
-    if not info_opt and len(args) == 0:
+    if not info_opt and not help_opt and len(args) == 0:
         print_generic_help()
 
 if __name__ == '__main__':
