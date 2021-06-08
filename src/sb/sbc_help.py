@@ -34,10 +34,10 @@ def print_help():
     print('`--info`: print a short description of the command')
 
 def print_generic_help():
+    '''print the generic help message'''
     # print the help message
     print('command usage:')
     print('`sb <command> [opts] [args]`')
-    print('')
     # print list of commands
     print('commands:')
     for name, path in get_commands():
@@ -46,7 +46,6 @@ def print_generic_help():
             continue
         info_str = commands.run_subprocess([sys.executable, path, '--info'])
         print(name + ': ' + info_str)
-    print('')
     # print some extra info
     print('for more info about a command, run `sb help <command>` or `sb <command> --help`')
 
