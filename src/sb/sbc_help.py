@@ -6,7 +6,7 @@ import getopt
 
 import commands
 
-INFO_STR = 'displays help messages'
+INFO_STR = 'prints help messages and info'
 
 def get_commands():
     '''get a list of bot command python scripts'''
@@ -24,7 +24,7 @@ def get_commands():
 
 def print_info():
     '''print the info message'''
-    print('prints help messages and info')
+    print(INFO_STR)
 
 def print_help():
     '''print the help message'''
@@ -41,13 +41,12 @@ def print_generic_help():
     # print list of commands
     print('commands:')
     for name, path in get_commands():
-        if name == 'help':
-            print(name + ': ' + INFO_STR)
-            continue
-        info_str = commands.run_subprocess([sys.executable, path, '--info'])
-        print(name + ': ' + info_str)
+        info_str = INFO_STR
+        if name != 'help':
+            info_str = commands.run_subprocess([sys.executable, path, '--info'])
+        print('`' + name + '`: ' + info_str)
     # print some extra info
-    print('for more info about a command, run `sb help <command>` or `sb <command> --help`')
+    print('for more info about a command, run `sb help <command>`')
 
 def main(argv):
     '''main function'''
@@ -60,21 +59,27 @@ def main(argv):
             info_opt = True
         elif opt == '--help':
             help_opt = True
-    # print help message
-    if help_opt:
-        print_help()
     # print info message
     if info_opt:
         print_info()
+    # print help message
+    if help_opt:
+        print_help()
     # print args command info
+    count = 0
     for i in args:
         script = commands.find_command_script(i)
         if script is None:
-            print('"' + i + '" is not a command')
+            print('`' + i + '` is not a command')
             continue
         command = [sys.executable, script, '--info', '--help']
         result = commands.run_subprocess(command)
+        if len(args) > 1:
+            print('`' + i + '`:')
         print(result)
+        count += 1
+        if count < len(args):
+            print('')
     # print generic help
     if not info_opt and not help_opt and len(args) == 0:
         print_generic_help()
