@@ -23,7 +23,7 @@ def run_command(name, args):
         command = [sys.executable, path]
         command.extend(args)
         return run_subprocess(command)
-    return '"' + name + '" is not a command'
+    return '`' + name + '` is not a command'
 
 def find_command_script(name):
     '''return the path to the script if it exists'''

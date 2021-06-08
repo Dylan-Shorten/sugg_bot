@@ -42,12 +42,12 @@ def print_generic_help():
     print('commands:')
     for name, path in get_commands():
         if name == 'help':
-            print(name + ': ' + INFO_STR)
+            print_info()
             continue
         info_str = commands.run_subprocess([sys.executable, path, '--info'])
-        print(name + ': ' + info_str)
+        print('`' + name + '`: ' + info_str)
     # print some extra info
-    print('for more info about a command, run `sb help <command>` or `sb <command> --help`')
+    print('for more info about a command, run `sb help <command>`')
 
 def main(argv):
     '''main function'''
@@ -70,7 +70,7 @@ def main(argv):
     for i in args:
         script = commands.find_command_script(i)
         if script is None:
-            print('"' + i + '" is not a command')
+            print('`' + i + '` is not a command')
             continue
         command = [sys.executable, script, '--info', '--help']
         result = commands.run_subprocess(command)
