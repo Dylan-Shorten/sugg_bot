@@ -34,6 +34,9 @@ def main(argv):
     # print message args
     if len(args) > 0:
         print(*args)
+    elif not info_opt and not help_opt:
+        print('error: no args')
+        print_help()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
